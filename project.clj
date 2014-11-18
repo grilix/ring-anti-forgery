@@ -1,6 +1,6 @@
-(defproject ring/ring-anti-forgery "1.0.0"
+(defproject org.clojars.grilix/ring-anti-forgery "1.0.0"
   :description "Ring middleware to prevent CSRF attacks"
-  :url "https://github.com/ring-clojure/ring-anti-forgery"
+  :url "https://github.com/grilix/ring-anti-forgery"
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.3.0"]
