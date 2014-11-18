@@ -3,16 +3,11 @@
   (:require [crypto.random :as random]
             [crypto.equality :as crypto]))
 
-(def ^{:doc "Binding that stores an anti-forgery token that must be included
-            in POST forms if the handler is wrapped in wrap-anti-forgery."
-       :dynamic true}
-  *anti-forgery-token*)
-
 (defn- new-token []
   (random/base64 60))
 
 (defn- session-token [request]
-  (get-in request [:session ::anti-forgery-token]))
+  (get-in request [:session :__anti-forgery-token]))
 
 (defn- assoc-session-token [response request token]
   (let [old-token (session-token request)]
@@ -20,7 +15,7 @@
       response
       (-> response
           (assoc :session (:session response (:session request)))
-          (assoc-in [:session ::anti-forgery-token] token)))))
+          (assoc-in [:session :__anti-forgery-token] token)))))
 
 (defn- form-params [request]
   (merge (:form-params request)
@@ -58,8 +53,8 @@
   returned by this function must contain a valid anti-forgery token, or else an
   access-denied response is returned.
 
-  The anti-forgery token can be placed into a HTML page via the
-  *anti-forgery-token* var, which is bound to a random key unique to the
+  The anti-forgery token can be placed into a HTML page using the session key
+  __anti-forgery-token, which is a random key unique to the
   current session. By default, the token is expected to be in a form field
   named '__anti-forgery-token', or in the 'X-CSRF-Token' or 'X-XSRF-Token'
   headers.
@@ -83,9 +78,9 @@
   {:pre [(not (and (:error-response options)
                    (:error-handler options)))]}
   (fn [request]
-    (binding [*anti-forgery-token* (or (session-token request) (new-token))]
+    (let [anti-forgery-token (or (session-token request) (new-token))]
       (if (and (not (get-request? request))
                (not (valid-request? request read-token)))
         (handle-error options request)
         (if-let [response (handler request)]
-          (assoc-session-token response request *anti-forgery-token*))))))
+          (assoc-session-token response request anti-forgery-token))))))

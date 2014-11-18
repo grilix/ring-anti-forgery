@@ -30,18 +30,20 @@ handler, inside of the standard `wrap-session` middleware in Ring:
 
 Any request that isn't a `HEAD` or `GET` request will now require an
 anti-forgery token, or an "access denied" response will be returned.
-The token is bound to the session, and accessible via the
-`*anti-forgery-token*` var.
+The token is bound to the session, and accessible via
+`((request :session) :__anti-forgery-token)`.
 
 By default the middleware looks for the anti-forgery token in the
 `__anti-forgery-token` form parameter, which can be added to your
-forms as a hidden field. For convenience, this library provides a
-function to generate the HTML of that hidden field:
+forms as a hidden field:
 
 ```clojure
-(use 'ring.util.anti-forgery)
+(let [session (request :session)]
+  (render "your-view.html" {:token (session :__anti-forgery-token)}))
+```
 
-(anti-forgery-field)  ;; returns the HTML for the anti-forgery field
+```html
+<input type="hidden" name="__anti-forgery-token" value="{{token}}" />
 ```
 
 The middleware also looks for the token in the `X-CSRF-Token` and
