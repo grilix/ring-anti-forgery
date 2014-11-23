@@ -71,14 +71,6 @@
           token    (get-in response [:session :__anti-forgery-token])]
       (is (not (.contains token "\n"))))))
 
-(deftest single-token-per-session-test
-  (let [expected {:status 200, :headers {}, :body "Foo"}
-        handler  (wrap-anti-forgery (constantly expected))
-        actual   (handler
-                  (-> (request :get "/")
-                      (assoc-in [:session :__anti-forgery-token] "foo")))]
-    (is (= actual expected))))
-
 (deftest not-overwrite-session-test
   (let [response {:status 200 :headers {} :body nil}
         handler  (wrap-anti-forgery (constantly response))
@@ -141,3 +133,10 @@
         tokens       (->> responses (map :session) (map :__anti-forgery-token))]
     (is (every? #(re-matches #"[A-Za-z0-9+/]{80}" %) tokens))
     (is (= (count tokens) (count (set tokens))))))
+
+(deftest token-available-on-first-request
+  (let [handler  (fn [req]
+                   (let [token (get-in req [:session :__anti-forgery-token])]
+                     {:status 200, :headers {}, :body token}))
+        response ((wrap-anti-forgery handler) (request :get "/"))]
+    (is (response :body))))

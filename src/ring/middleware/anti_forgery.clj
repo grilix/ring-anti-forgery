@@ -9,13 +9,21 @@
 (defn- session-token [request]
   (get-in request [:session :__anti-forgery-token]))
 
-(defn- assoc-session-token [response request token]
-  (let [old-token (session-token request)]
-    (if (= old-token token)
+(defn- prepare-request [request]
+  (if (session-token request)
+    request
+    (assoc-in request
+              [:session :__anti-forgery-token]
+              (new-token))))
+
+(defn- assoc-session-token [response request]
+  (let [request-token (session-token request)
+        response-token (session-token response)]
+    (if (= request-token response-token)
       response
       (-> response
           (assoc :session (:session response (:session request)))
-          (assoc-in [:session :__anti-forgery-token] token)))))
+          (assoc-in [:session :__anti-forgery-token] request-token)))))
 
 (defn- form-params [request]
   (merge (:form-params request)
@@ -78,9 +86,10 @@
   {:pre [(not (and (:error-response options)
                    (:error-handler options)))]}
   (fn [request]
-    (let [anti-forgery-token (or (session-token request) (new-token))]
+    (let [request (prepare-request request)]
       (if (and (not (get-request? request))
                (not (valid-request? request read-token)))
         (handle-error options request)
         (if-let [response (handler request)]
-          (assoc-session-token response request anti-forgery-token))))))
+          (assoc-session-token response request))))))
+
