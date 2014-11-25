@@ -1,6 +1,6 @@
 # Ring-Anti-Forgery
 
-[![Build Status](https://secure.travis-ci.org/ring-clojure/ring-anti-forgery.png)](http://travis-ci.org/ring-clojure/ring-anti-forgery)
+[![Build Status](https://secure.travis-ci.org/grilix/ring-anti-forgery.png)](http://travis-ci.org/grilix/ring-anti-forgery)
 
 Ring middleware that prevents [CSRF][1] attacks by via a
 randomly-generated anti-forgery token.
@@ -11,7 +11,7 @@ randomly-generated anti-forgery token.
 
 Add the following dependency to your `project.clj`:
 
-    [org.clojars.grilix/ring-anti-forgery "1.0.0"]
+    [org.clojars.grilix/ring-anti-forgery "1.0.2"]
 
 ## Usage
 
@@ -106,5 +106,7 @@ middleware should not be applied to handlers that define web services.
 ## License
 
 Copyright © 2014 James Reeves
+
+Copyright © 2014 Gonzalo Arreche
 
 Distributed under the MIT License, the same as Ring.

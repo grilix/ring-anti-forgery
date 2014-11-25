@@ -1,4 +1,4 @@
-(defproject org.clojars.grilix/ring-anti-forgery "1.0.1"
+(defproject org.clojars.grilix/ring-anti-forgery "1.0.2"
   :description "Ring middleware to prevent CSRF attacks"
   :url "https://github.com/grilix/ring-anti-forgery"
   :license {:name "The MIT License"
